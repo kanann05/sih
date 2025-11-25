@@ -1,4 +1,41 @@
-export default ChatbotScreen = () => {
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+
+import {
+  Eye,
+  EyeOff,
+  User,
+  Mail,
+  Lock,
+  LogOut,
+  Home,
+  CheckCircle,
+  BookOpen,
+  Search,
+  MessageCircle,
+  Award,
+  Users,
+  Download,
+  Play,
+  HelpCircle,
+  ArrowRight,
+  ArrowLeft,
+  Globe,
+  PhoneCall,
+  AlertCircle,
+  Smartphone,
+  Building,
+  CreditCard,
+  Shield,
+  Star,
+  Trophy,
+  Bell,
+  X,
+  Menu,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+const ChatbotScreen = () => {
   const [t, i18n] = useTranslation("global");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
@@ -238,3 +275,5 @@ export default ChatbotScreen = () => {
     </div>
   );
 };
+
+export default ChatbotScreen

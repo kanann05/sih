@@ -1,7 +1,41 @@
-import { useTranslation } from "react-i18next";
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
-export default ToolsScreen = () => {
+import {
+  Eye,
+  EyeOff,
+  User,
+  Mail,
+  Lock,
+  LogOut,
+  Home,
+  CheckCircle,
+  BookOpen,
+  Search,
+  MessageCircle,
+  Award,
+  Users,
+  Download,
+  Play,
+  HelpCircle,
+  ArrowRight,
+  ArrowLeft,
+  Globe,
+  PhoneCall,
+  AlertCircle,
+  Smartphone,
+  Building,
+  CreditCard,
+  Shield,
+  Star,
+  Trophy,
+  Bell,
+  X,
+  Menu,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+const ToolsScreen = () => {
   const [t, i18n] = useTranslation("global");
   const [selectedTool, setSelectedTool] = useState(null);
 
@@ -168,3 +202,5 @@ export default ToolsScreen = () => {
     </div>
   );
 };
+
+export default ToolsScreen

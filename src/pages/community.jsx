@@ -1,4 +1,4 @@
-export default CommunityScreen = () => {
+const CommunityScreen = () => {
   const [t, i18n] = useTranslation("global");
   const [activeTab, setActiveTab] = useState("quiz");
   const [quizScore, setQuizScore] = useState(null);
@@ -350,3 +350,5 @@ export default CommunityScreen = () => {
     </div>
   );
 };
+
+export default CommunityScreen

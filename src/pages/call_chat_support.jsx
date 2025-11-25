@@ -1,4 +1,4 @@
-export default ContactScreen = () => {
+const ContactScreen = () => {
   const [t, i18n] = useTranslation("global");
 
   return (
@@ -184,3 +184,5 @@ export default ContactScreen = () => {
     </div>
   );
 };
+
+export default ContactScreen
