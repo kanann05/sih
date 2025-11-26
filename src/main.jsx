@@ -10,6 +10,7 @@ import global_mar from "./locales/mar/mar.json";
 import global_hin from "./locales/hin/hin.json";
 import i18next from "i18next";
 import { I18nextProvider } from "react-i18next";
+import LangContextProvider, { Lang } from "./i18n.jsx";
 // import { LanguageProvider } from "./context/LanguageContext.js";
 i18next.init({
   interpolation: { escapeValue: false },
@@ -30,9 +31,11 @@ i18next.init({
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     {/* <LanguageProvider> */}
+    <LangContextProvider>
     <I18nextProvider i18n={i18next}>
       <App />
     </I18nextProvider>
+    </LangContextProvider>
     {/* </LanguageProvider> */}
   </StrictMode>
 );

@@ -6,6 +6,8 @@ import Help_Center from './pages/help_center'
 import Community from './pages/community'
 import Tools_And_Resources from './pages/tools_and_resources'
 import Call_Chat_Support from './pages/call_chat_support'
+import {Lang} from './i18n'
+// import { useAppStore } from "../store/useAppStore";
 import {
   Eye,
   EyeOff,
