@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import data from '../lang/texts.json'
 
 import {
   Eye,
@@ -35,55 +36,73 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+ 
+
 const AwarenessScreen = () => {
-  const [t, i18n] = useTranslation("global");
+  const [language, setLanguage] = useState("en");
+  const languages = {
+    en: "English",
+    hin: "हिंदी",
+    mar: "मराठी",
+  };
+  const [content, setContent] = useState(data.find(item => item.page === "learn_the_difference")[language])
+  useEffect(() => {console.log(content)}, [content])
+
+  const changeLang = (lang) => {
+    console.log(lang);
+    setLanguage(lang);
+    i18n.changeLanguage(lang);
+  };
+
   const [currentCard, setCurrentCard] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
 
+  // useEffect(() => {i18n.changeLanguage("mar")}, [])
+
   const comparisonCards = [
     {
-      title: "Aadhaar Linked Account",
+      title: content[1][3],
       icon: <CreditCard className="w-12 h-12 text-orange-500" />,
-      description: "Your Aadhaar is connected to your bank account",
+      description: content[1][4],
       features: [
-        "Basic KYC completed",
-        "Can do banking operations",
-        "But cannot receive government benefits directly",
+        content[1][5],
+        content[1][6],
+        content[1][7],
       ],
-      status: "Not Sufficient",
+      status: content[1][8],
       statusColor: "text-red-600 bg-red-100",
     },
     {
-      title: "DBT-Enabled Account",
+      title: content[1][9],
       icon: <Shield className="w-12 h-12 text-green-500" />,
-      description: "Your account can receive Direct Benefit Transfers",
+      description: content[1][10],
       features: [
-        "Aadhaar seeded in NPCI system",
-        "Can receive scholarships directly",
-        "Government benefits transfer smoothly",
+        content[1][10],
+        content[1][11],
+        content[1][12],
       ],
-      status: "Ready for Benefits",
+      status: content[1][13],
       statusColor: "text-green-600 bg-green-100",
     },
   ];
 
   const steps = [
     {
-      title: "Link Aadhaar with Bank",
+      title: content[2][1],
       description:
-        "Visit your bank branch or use net banking to link your Aadhaar",
+       content[2][2],
       icon: <Building className="w-8 h-8 text-blue-600" />,
       completed: currentStep >= 0,
     },
     {
-      title: "Seed Aadhaar in DBT System",
-      description: "Bank will register your Aadhaar in NPCI's DBT database",
+      title: content[2][3],
+      description: content[2][4],
       icon: <Smartphone className="w-8 h-8 text-orange-600" />,
       completed: currentStep >= 1,
     },
     {
-      title: "Confirm DBT Status",
-      description: "Verify your account is DBT-enabled through NPCI portal",
+      title: content[2][5],
+      description: content[2][6],
       icon: <CheckCircle className="w-8 h-8 text-green-600" />,
       completed: currentStep >= 2,
     },
@@ -93,17 +112,17 @@ const AwarenessScreen = () => {
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Understanding the Difference
+          {content[0][0]}
         </h2>
         <p className="text-gray-600">
-          Learn why DBT-enabling is crucial for receiving scholarships
+          {content[0][1]}
         </p>
       </div>
 
       {/* Interactive Comparison Cards */}
       <div className="bg-white rounded-2xl shadow-lg p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-6">
-          Compare Account Types
+          {content[1][0]}
         </h3>
 
         <div className="flex items-center justify-between mb-4">
@@ -115,7 +134,7 @@ const AwarenessScreen = () => {
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            Aadhaar Linked
+            {content[1][1]}
           </button>
           <ArrowRight className="w-6 h-6 text-gray-400" />
           <button
@@ -126,7 +145,7 @@ const AwarenessScreen = () => {
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            DBT-Enabled
+            {content[1][2]}
           </button>
         </div>
 
@@ -203,10 +222,9 @@ const AwarenessScreen = () => {
           <div className="flex items-start space-x-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
             <div>
-              <h4 className="font-medium text-yellow-800">Important Note</h4>
+              <h4 className="font-medium text-yellow-800">{content[2][7]}</h4>
               <p className="text-sm text-yellow-700 mt-1">
-                DBT seeding can take 24-48 hours to complete. Always verify your
-                status before scholarship deadlines.
+                {content[2][8]}
               </p>
             </div>
           </div>

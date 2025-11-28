@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useNavigation, Link } from 'react-router-dom';
 import Awareness_Screen from './pages/learn_the_difference'
 import Check_DBT_Status from './pages/check_dbt_status'
 import Help_Center from './pages/help_center'
@@ -39,9 +39,13 @@ import {
   Bell,
   X,
   Menu,
+  Key,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
+import data from './lang/texts.json'
+const Key_To_Screen = ["home", "awareness", "check", "chatbot", "community", "tools", "contact"]
+const key_to_link = ["/", "/learn_the_difference"]
+// const key_to_link = {"home" : "/", "awareness" : "/learn_the_difference"}
 // Add this after your imports, before the DBTAwarenessApp component
 const USERS = [
   {
@@ -66,15 +70,18 @@ const USERS = [
 
 // Main App Component
 const DBTAwarenessApp = () => {
+
+  const [language, setLanguage] = useState(localStorage.getItem("lang"));
   const [isAuthenticated, setIsAuthenticated] = useState(true); //change
   const [currentUser, setCurrentUser] = useState(null);
   const [t, i18n] = useTranslation("global");
-  const [currentScreen, setCurrentScreen] = useState("awareness");
-  const [language, setLanguage] = useState("english");
+  const [currentScreen, setCurrentScreen] = useState("home");
+  // const [language, setLanguage] = useState("english");
   const [showNotification, setShowNotification] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const nav = useNavigate();
   
+  const [contentNav, setContentNav] = useState(data.find(item => item.page === "nav")[language])
 
   // Authentication handlers
   const handleLogin = (user) => {
@@ -86,7 +93,12 @@ const DBTAwarenessApp = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
   };
+  useEffect(() => {
+  const navData = data.find(item => item.page === "nav");
+  setContentNav(navData[language]);
+}, [language]);
 
+  // localStorage.setItem("lang", "en")
   const screens = {
     home: t("home.navigation.home"),
     awareness: t("home.navigation.learn_the_difference"),
@@ -112,12 +124,201 @@ const DBTAwarenessApp = () => {
   useEffect(() => {
     const timer = setTimeout(() => setShowNotification(true), 3000);
     return () => clearTimeout(timer);
+    
   }, []);
+
+  useEffect(() => {localStorage.setItem("lang", language)}, [language])
 
   // Show login screen if not authenticated
   if (!isAuthenticated) {
     return <AuthScreen onLogin={handleLogin} />;
   }
+
+  const HomeScreen = ({ setCurrentScreen }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [t, i18n] = useTranslation("global");
+  const languages = {
+    en: "English",
+    hin: "हिंदी",
+    mar: "मराठी",
+  };
+  const [content, setContent] = useState(data.find(item => item.page === "home")[language])
+  useEffect(() => {setContent(data.find(item => item.page === "home")[language])}, [language])
+
+  useEffect(() => {console.log(content)}, [content])
+  const infoSlides = [
+    {
+      icon: <AlertCircle className="w-8 h-8 text-red-500" />,
+      title: content[3][1],
+      content:content[3][2],
+      description: content[3][3],
+    },
+    {
+      icon: <CreditCard className="w-8 h-8 text-orange-500" />,
+      title: content[3][4],
+      content: content[3][5],
+      description: content[3][6],
+    },
+    {
+      icon: <Building className="w-8 h-8 text-green-500" />,
+      title: content[3][7],
+      content: content[3][8],
+      description: content[3][9],
+    },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % infoSlides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="space-y-8">
+      {/* Hero Section */}
+      <div className="text-center py-8">
+        <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-green-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+          <Shield className="w-12 h-12 text-white" />
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          {content[0][0]}
+        </h1>
+        {/* <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Secure Your Scholarship
+        </h1> */}
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          {content[0][1]}
+        </p>
+        {/* <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Ensure your bank account is DBT-enabled to receive government benefits
+          without delays
+        </p> */}
+      </div>
+
+      {/* Main Action Buttons */}
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <button
+          onClick={() => setCurrentScreen("check")}
+          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        >
+          <CheckCircle className="w-12 h-12 mx-auto mb-4" />
+          <h3 className="text-xl font-bold mb-2">
+            {content[1][0]}
+          </h3>
+          <p className="text-blue-100">
+            {" "}
+            {content[1][1]}
+          </p>
+          {/* <p className="text-blue-100">Verify if your account is DBT-enabled</p> */}
+        </button>
+
+        <button
+          // onClick={() => setCurrentScreen("awareness")}
+          
+
+          className="bg-gradient-to-r from-green-600 to-green-700 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        >
+          <BookOpen className="w-12 h-12 mx-auto mb-4" />
+          <h3 className="text-xl font-bold mb-2">
+            {" "}
+            {content[2][0]}
+          </h3>
+          {/* <h3 className="text-xl font-bold mb-2">Learn the Difference</h3> */}
+          <p className="text-green-100">
+             {content[2][1]}
+          </p>
+          {/* <p className="text-green-100">
+            Understand Aadhaar link vs DBT-enabled
+          </p> */}
+        </button>
+      </div>
+
+      {/* Info Slider */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">
+            {content[3][0]}
+          </h3>
+          {/* <h3 className="text-lg font-semibold text-gray-800">
+            Quick Information
+          </h3> */}
+          <div className="flex space-x-2">
+            {infoSlides.map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  currentSlide === index ? "bg-blue-600" : "bg-gray-300"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="min-h-[120px] bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6">
+          <div className="flex items-start space-x-4">
+            {infoSlides[currentSlide].icon}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">
+                {infoSlides[currentSlide].title}
+              </h4>
+              <p className="text-lg font-medium text-gray-800 mb-2">
+                {infoSlides[currentSlide].content}
+              </p>
+              <p className="text-sm text-gray-600">
+                {infoSlides[currentSlide].description}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Access Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <button
+          onClick={() => setCurrentScreen("chatbot")}
+          className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+        >
+          <MessageCircle className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+          {/* <span className="text-sm font-medium text-gray-800">Help Center</span> */}
+          <span className="text-sm font-medium text-gray-800">
+            {content[4][0]}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setCurrentScreen("tools")}
+          className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+        >
+          <Download className="w-8 h-8 text-green-600 mx-auto mb-2" />
+          {/* <span className="text-sm font-medium text-gray-800">Resources</span> */}
+          <span className="text-sm font-medium text-gray-800">
+             {content[4][2]}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setCurrentScreen("community")}
+          className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+        >
+          <Users className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+          <span className="text-sm font-medium text-gray-800">
+             {content[4][1]}
+          </span>
+          {/* <span className="text-sm font-medium text-gray-800">Community</span> */}
+        </button>
+
+        <button className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+          <PhoneCall className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+          <span className="text-sm font-medium text-gray-800">
+             {content[4][3]}
+          </span>
+          {/* <span className="text-sm font-medium text-gray-800">Contact</span> */}
+        </button>
+      </div>
+    </div>
+  );
+};
 
   // Rest of your existing code continues here...
   return (
@@ -144,13 +345,13 @@ const DBTAwarenessApp = () => {
               <div className="hidden md:flex items-center space-x-2 px-3 py-2 bg-blue-50 rounded-lg">
                 <User className="w-4 h-4 text-blue-600" />
                 <span className="text-sm font-medium text-blue-900">
-                  {currentUser?.username || "User"}
+                  {contentNav[0][0]}
                 </span>
               </div>
 
               <select
                 value={language}
-                onChange={(e) => changeLang(e.target.value)}
+                onChange={(e) => {changeLang(e.target.value); console.log(e.target.value)}}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
               >
                 {Object.entries(languages).map(([key, value]) => (
@@ -185,12 +386,14 @@ const DBTAwarenessApp = () => {
           {/* Mobile Menu */}
           {menuOpen && (
             <div className="md:hidden mt-4 space-y-2">
-              {Object.entries(screens).map(([key, value]) => (
+              {/* {Object.entries(screens).map(([key, value]) => (
                 <button
                   key={key}
                   onClick={() => {
+               
                     setCurrentScreen(key);
                     setMenuOpen(false);
+                   
                   }}
                   className={`w-full text-left px-4 py-2 rounded-lg ${
                     currentScreen === key
@@ -200,7 +403,26 @@ const DBTAwarenessApp = () => {
                 >
                   {value}
                 </button>
+              ))} */}
+
+              {Object.entries(screens).map(([key, value]) => (
+                <Link
+                  key={key}
+                  to={key_to_link[key]}
+                  // onClick={() => {
+                  //   setCurrentScreen(key);
+                  //   setMenuOpen(false);
+                  // }}
+                  className={`w-full block px-4 py-2 rounded-lg ${
+                    currentScreen === key
+                      ? "bg-blue-100 text-blue-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {value}
+                </Link>
               ))}
+
             </div>
           )}
         </div>
@@ -210,19 +432,25 @@ const DBTAwarenessApp = () => {
       <nav className="hidden md:block bg-white border-b">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex space-x-8">
-            {Object.entries(screens).map(([key, value]) => (
-              <button
+            {Object.entries(contentNav[1]).map(([key, value]) => (
+              <Link
                 key={key}
-                onClick={() => setCurrentScreen(key)}
-                className={`py-4 px-2 border-b-2 transition-colors ${
+                to={key_to_link[key]}
+                onClick={() => {
+                  // setCurrentScreen(key);
+                  // setMenuOpen(false);
+                }}
+                className={`w-full block px-4 py-2 rounded-lg ${
                   currentScreen === key
-                    ? "border-blue-500 text-blue-600 font-medium"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                    ? "bg-blue-100 text-blue-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
                 {value}
-              </button>
+              </Link>
             ))}
+
+            
           </div>
         </div>
       </nav>
@@ -701,183 +929,7 @@ const AuthScreen = ({ onLogin }) => {
 };
 
 // Home Screen Component
-const HomeScreen = ({ setCurrentScreen }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [t, i18n] = useTranslation("global");
 
-  const infoSlides = [
-    {
-      icon: <AlertCircle className="w-8 h-8 text-red-500" />,
-      title: t("home.quickinfo.info1.title"),
-      content: t("home.quickinfo.info1.component"),
-      description: t("home.quickinfo.info1.description"),
-    },
-    {
-      icon: <CreditCard className="w-8 h-8 text-orange-500" />,
-      title: t("home.quickinfo.info2.title"),
-      content: t("home.quickinfo.info2.component"),
-      description: t("home.quickinfo.info2.description"),
-    },
-    {
-      icon: <Building className="w-8 h-8 text-green-500" />,
-      title: t("home.quickinfo.info3.title"),
-      content: t("home.quickinfo.info3.component"),
-      description: t("home.quickinfo.info3.description"),
-    },
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % infoSlides.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="space-y-8">
-      {/* Hero Section */}
-      <div className="text-center py-8">
-        <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-green-600 rounded-full mx-auto mb-6 flex items-center justify-center">
-          <Shield className="w-12 h-12 text-white" />
-        </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          {t("home.title")}
-        </h1>
-        {/* <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          Secure Your Scholarship
-        </h1> */}
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          {t("home.subtitle")}
-        </p>
-        {/* <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Ensure your bank account is DBT-enabled to receive government benefits
-          without delays
-        </p> */}
-      </div>
-
-      {/* Main Action Buttons */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <button
-          onClick={() => setCurrentScreen("check")}
-          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-        >
-          <CheckCircle className="w-12 h-12 mx-auto mb-4" />
-          <h3 className="text-xl font-bold mb-2">
-            {t("home.main.check_dbt_status.main_line")}
-          </h3>
-          <p className="text-blue-100">
-            {" "}
-            {t("home.main.check_dbt_status.sub_line")}
-          </p>
-          {/* <p className="text-blue-100">Verify if your account is DBT-enabled</p> */}
-        </button>
-
-        <button
-          // onClick={() => setCurrentScreen("awareness")}
-          
-
-          className="bg-gradient-to-r from-green-600 to-green-700 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-        >
-          <BookOpen className="w-12 h-12 mx-auto mb-4" />
-          <h3 className="text-xl font-bold mb-2">
-            {" "}
-            {t("home.main.learn_the_difference.main_line")}
-          </h3>
-          {/* <h3 className="text-xl font-bold mb-2">Learn the Difference</h3> */}
-          <p className="text-green-100">
-            {t("home.main.learn_the_difference.sub_line")}
-          </p>
-          {/* <p className="text-green-100">
-            Understand Aadhaar link vs DBT-enabled
-          </p> */}
-        </button>
-      </div>
-
-      {/* Info Slider */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">
-            {t("home.quickinfo.title")}
-          </h3>
-          {/* <h3 className="text-lg font-semibold text-gray-800">
-            Quick Information
-          </h3> */}
-          <div className="flex space-x-2">
-            {infoSlides.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  currentSlide === index ? "bg-blue-600" : "bg-gray-300"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="min-h-[120px] bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6">
-          <div className="flex items-start space-x-4">
-            {infoSlides[currentSlide].icon}
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-1">
-                {infoSlides[currentSlide].title}
-              </h4>
-              <p className="text-lg font-medium text-gray-800 mb-2">
-                {infoSlides[currentSlide].content}
-              </p>
-              <p className="text-sm text-gray-600">
-                {infoSlides[currentSlide].description}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Access Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <button
-          onClick={() => setCurrentScreen("chatbot")}
-          className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
-        >
-          <MessageCircle className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-          {/* <span className="text-sm font-medium text-gray-800">Help Center</span> */}
-          <span className="text-sm font-medium text-gray-800">
-            {t("home.footer.helpcenter")}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setCurrentScreen("tools")}
-          className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
-        >
-          <Download className="w-8 h-8 text-green-600 mx-auto mb-2" />
-          {/* <span className="text-sm font-medium text-gray-800">Resources</span> */}
-          <span className="text-sm font-medium text-gray-800">
-            {t("home.footer.toolsandresources")}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setCurrentScreen("community")}
-          className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
-        >
-          <Users className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-          <span className="text-sm font-medium text-gray-800">
-            {t("home.footer.community")}
-          </span>
-          {/* <span className="text-sm font-medium text-gray-800">Community</span> */}
-        </button>
-
-        <button className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-          <PhoneCall className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-          <span className="text-sm font-medium text-gray-800">
-            {t("home.footer.contact")}
-          </span>
-          {/* <span className="text-sm font-medium text-gray-800">Contact</span> */}
-        </button>
-      </div>
-    </div>
-  );
-};
 
 // Awareness Screen Component
 // const AwarenessScreen = () => {
