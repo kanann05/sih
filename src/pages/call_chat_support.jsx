@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
+import data from '../lang/texts.json'
 
 import {
   Eye,
@@ -35,7 +36,78 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-const ContactScreen = () => {
+const Key_To_Screen = ["home", "awareness", "check", "chatbot", "community", "tools", "contact"]
+const key_to_link = ["/", "/learn_the_difference", "/check_dbt_status", "/help_center", "/community", "/tools_and_resources", "/call_chat_support"]
+
+
+
+const DBTAwarenessApp = () => {
+
+  const [language, setLanguage] = useState(localStorage.getItem("lang"));
+  const [isAuthenticated, setIsAuthenticated] = useState(true); //change
+  const [currentUser, setCurrentUser] = useState(null);
+  const [t, i18n] = useTranslation("global");
+  const [currentScreen, setCurrentScreen] = useState("check");
+  // const [language, setLanguage] = useState("english");
+  const [showNotification, setShowNotification] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const nav = useNavigate();
+  
+  const [contentNav, setContentNav] = useState(data.find(item => item.page === "nav")[language])
+
+  // Authentication handlers
+  const handleLogin = (user) => {
+    setIsAuthenticated(true);
+    setCurrentUser(user);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+  };
+  useEffect(() => {
+  const navData = data.find(item => item.page === "nav");
+  setContentNav(navData[language]);
+}, [language]);
+
+  // localStorage.setItem("lang", "en")
+  const screens = {
+    home: t("home.navigation.home"),
+    awareness: t("home.navigation.learn_the_difference"),
+    check: t("home.navigation.check_dbt_status"),
+    chatbot: t("home.navigation.help_center"),
+    community: t("home.navigation.community"),
+    tools: t("home.navigation.tools_and_resources"),
+    contact: t("home.navigation.call_and_chat_support"), // Add this line
+  };
+
+  const languages = {
+    en: "English",
+    hin: "हिंदी",
+    mar: "मराठी",
+  };
+
+  const changeLang = (lang) => {
+    console.log(lang);
+    setLanguage(lang);
+    i18n.changeLanguage(lang);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowNotification(true), 3000);
+    return () => clearTimeout(timer);
+    
+  }, []);
+
+  useEffect(() => {localStorage.setItem("lang", language)}, [language])
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <AuthScreen onLogin={handleLogin} />;
+  }
+
+
+ const ContactScreen = () => {
   const [t, i18n] = useTranslation("global");
 
   return (
@@ -222,4 +294,182 @@ const ContactScreen = () => {
   );
 };
 
-export default ContactScreen
+
+
+  return(
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+      {/* Header */}
+       
+      <header className="bg-white shadow-lg border-b-4 border-orange-400">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-green-600 rounded-full flex items-center justify-center">
+                <Shield className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-800">
+                  QuickLink DBT
+                </h1>
+                <p className="text-sm text-gray-600">Direct Benefit Transfer</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              {/* User Info Display */}
+              <div className="hidden md:flex items-center space-x-2 px-3 py-2 bg-blue-50 rounded-lg">
+                <User className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-900">
+                  {contentNav[0][0]}
+                </span>
+              </div>
+
+              <select
+                value={language}
+                onChange={(e) => {changeLang(e.target.value); console.log(e.target.value)}}
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+              >
+                {Object.entries(languages).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg hover:bg-red-50 text-red-600"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+              >
+                {menuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          {menuOpen && (
+            <div className="md:hidden mt-4 space-y-2">
+              {/* {Object.entries(screens).map(([key, value]) => (
+                <button
+                  key={key}
+                  onClick={() => {
+               
+                    setCurrentScreen(key);
+                    setMenuOpen(false);
+                   
+                  }}
+                  className={`w-full text-left px-4 py-2 rounded-lg ${
+                    currentScreen === key
+                      ? "bg-blue-100 text-blue-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {value}
+                </button>
+              ))} */}
+
+              {Object.entries(screens).map(([key, value]) => (
+                <Link
+                  key={key}
+                  to={key_to_link[key]}
+                  // onClick={() => {
+                  //   setCurrentScreen(key);
+                  //   setMenuOpen(false);
+                  // }}
+                  className={`w-full block px-4 py-2 rounded-lg ${
+                    currentScreen === key
+                      ? "bg-blue-100 text-blue-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {value}
+                </Link>
+              ))}
+
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* Navigation */}
+      <nav className="hidden md:block bg-white border-b">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex space-x-8">
+            {Object.entries(contentNav[1]).map(([key, value]) => (
+              <Link
+                key={key}
+                to={key_to_link[key]}
+                onClick={() => {
+                  // setCurrentScreen(key);
+                  // setMenuOpen(false);
+                }}
+                className={`w-full block px-4 py-2 rounded-lg ${
+                  currentScreen === key
+                    ? "bg-blue-100 text-blue-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {value}
+              </Link>
+            ))}
+
+            
+          </div>
+        </div>
+      </nav>
+
+      {/* Notification Banner */}
+      {showNotification && (
+        <div className="bg-orange-100 border border-orange-400 px-4 py-3 relative">
+          <div className="flex items-center justify-between max-w-4xl mx-auto">
+            <div className="flex items-center space-x-2">
+              <Bell className="w-5 h-5 text-orange-600" />
+              <span className="text-orange-800 text-sm text-center font-medium">
+                {t("fact")}
+              </span>
+            </div>
+            <button
+              onClick={() => setShowNotification(false)}
+              className="text-orange-600 hover:text-orange-800"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        {currentScreen === "home" && (
+          <HomeScreen setCurrentScreen={setCurrentScreen} />
+        )}
+        {<ContactScreen/>}
+      </main>
+    </div>
+  ) }
+
+export default DBTAwarenessApp
+
+
+
+
+
+
+
+
+
+
+
+
